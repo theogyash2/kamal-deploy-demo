@@ -1,0 +1,35 @@
+service: kamal-deploy
+
+image: kamal-deploy
+
+servers:
+  web:
+    - 3.6.37.13
+    - 35.154.123.133
+    - 13.233.97.121
+    
+ssh: 
+  user: root
+  keys: 
+    - /Users/yash/Downloads/kamal-test.pem
+
+
+
+registry:
+  server: 977098999002.dkr.ecr.ap-south-1.amazonaws.com
+  username: AWS
+  password: eyJwYXlsb2FkIjoia2V5SzdwVEw4dTVvUytKVWQzbGhyMUo5NkxhbVRFcXc3VFJ1TDZtUWdUeWUyZXJoMnNQcEVqVUQzUnkwTlpQRk1EUXhGQVQ3UjI3YnVteS9RSU90ajcxRTJsTkVGMEppRkJJTURHNVlIYmNXM3NZM2VTSzZ4Nll1cEhLTkFmS2pzdXFpZm9uYytFaTBFKzRESFRRQzI1N3RCTFF1bmI0ZDhQQjhpVDByaERJZXYzQ2VxV1dmME5mTGxBeldhL3FOVnhUc1hmV0lwUlQ0dTJST1lHM3dIUFFRRnBoT0pWRHVFazNnNC8ydmdYYWxLM0Z4dmxHMXR0VW8vejUzOFdacTdCUUxFNWdmYXpKeG9RNGRhSjV3WGVHQnArZm9uSktTSmtsZm10cnRuWUFGbXU5cVJzcXdkYlhGSklteHdHL2NqOW5VSHNIVXFkOFVtb2dSQXU4dUdUYkI3VEJUcTYzcWpZa2g1dGQ1cDcxQnpkYmdZZVFKVXoyOWhRbitJeStlYlN5N2xWdk1Bbi9TU3NjVTI1cnVtdkdkMWlEQnVDWURnWXJlUVhDWlV6N3J5MEk1VTEwM1hsN0hpRGxQeUR6eCs4OEh1dVg2U041Vzk4ZUdtT1Z5L3VBa1N3REgxejJibFU3KzlrZmRCSzZZaWVxY1k0c2IvbHRZK1NlWXFhZ3ZZUG5BWi9yR0ZWUlFHZDZjb0xjbnpocmxWUktnRGVMZnRqeGhvZWNjUzVGU3E4U2tJSGw2cWJMdFk1dTRiOUlMZWxhVHJSZUMySVpwSm1GK0xnVUtPNHBkTmZwODFybWtQL2tXaTN2Tk1CWFBwL1VzbnBNaHdXdGZkb2N2MXNhOFdrQmd2bE43V1NDSkgza2JDRFUvWEZ3a1hqZkdyNDhnRDVqUThvc2l2ZnQ4Y2I4RTFhakhCOVo4U2JRSHhyUmxZejNFL2V1R2szS3JMYkgwK1VwdUdkeW14TzB3YVR1RWZGZCtmZWdLTmxnVzU1N002bEZ4SUpvQ3pBNFByaDR1djV5Tk5kSHdNQ201MjREdTQycmFTcFdEbGl1U29IbGRRU1ppNWYvcERCOXhKOVpuTGpzTGtIcVhNRzNQcENMd0g4cTVHaG9Da1VIZ01kdWlidElpbVMvSy82azBTTUlhV0RHWUFPekJLSTNRNklTNnRWOVRMc1lEdWRRTGxOTzlHcm5mK3YwZnF0dk1LNlZmQmdFTWltZFBJbEFVMmY2ZG40UllGYUpncTNXSmVsSHgvQ20zNGNYcDQ4YmZ4ZjYzOWVPQXZub1pYYXRpell4bjBWWTB4aElLM0VCMHlKQW1UaG1rRUxWTDI3Mzd4Qm1EY2tZd2o3YW1YdmRpcTVOalRnPT0iLCJkYXRha2V5IjoiQVFJQkFIaUhXYVlUblJVV0NibnorN0x2TUcrQVB2VEh6SGxCVVE5RnFFbVYyNkJkd3dGSENGcGwzL2xGc3JQekl2SzF4VUQwQUFBQWZqQjhCZ2txaGtpRzl3MEJCd2FnYnpCdEFnRUFNR2dHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNTmptODJrKy9PWWlUaWlBWkFnRVFnRHVIOHJ2dGdGamZNYzNjL3VBS0VRV0g1Z3NiRmZ6OGxoOXpRa04zcVFuRThqazlidkpEd1NlYUpHaFZuMkRHSFk3c3ROVFJ4RHRuSld6SzRBPT0iLCJ2ZXJzaW9uIjoiMiIsInR5cGUiOiJEQVRBX0tFWSIsImV4cGlyYXRpb24iOjE3NjQ2OTkyMzl9
+
+proxy:
+  app_port: 3000           # tells kamal-proxy which port your app listens on (defaults to 80)
+  healthcheck:             # optional — tune the healthcheck behaviour
+    path: /up              # default is /up (leave if your app exposes /up)
+    interval: 1            # seconds between checks
+    timeout: 2 
+
+builder:   # <<< important: NO docker-container BuildKit
+  arch: amd64
+
+env:
+  clear:
+    PORT: 3000

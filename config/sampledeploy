@@ -1,0 +1,177 @@
+# 🚀 Comprehensive Kamal Deploy Configuration (deploy.yml)
+
+# -------------------------------------------------------------------------
+# 1. APPLICATION & IMAGE (Core Identity)
+# -------------------------------------------------------------------------
+
+# The name of the application. Used as the prefix for all Docker containers,
+# images, and service names (e.g., 'myapp-web', 'myapp-worker').
+service: myapp
+
+# The target image for deployment. Kamal will use this name to build, tag, 
+# and push the image to your container registry.
+image: your_registry_user/myapp
+
+# -------------------------------------------------------------------------
+# 2. BUILDER (Docker Image Creation)
+# -------------------------------------------------------------------------
+
+builder:
+  # The architecture to build the image for. Use 'amd64' for standard servers
+  # (AWS, DigitalOcean) or 'arm64' for Apple M-series chips or certain cloud VMs.
+  arch: amd64
+
+  # The directory containing the source code (the build context) 
+  # relative to where you run 'kamal deploy'. Use '.' for the project root.
+  context: .
+
+  # Specifies the path to the Dockerfile to use for the build.
+  dockerfile: Dockerfile
+
+  # Optional: Arguments passed to 'docker build --build-arg'. Useful for secrets 
+  # or environment-dependent variables during the build phase.
+  args:
+    SECRET_KEY_BASE: 'some_base_key'
+
+# -------------------------------------------------------------------------
+# 3. REGISTRY (Image Repository)
+# -------------------------------------------------------------------------
+
+registry:
+  # The address of your container registry (e.g., Docker Hub, AWS ECR, GitHub CR).
+  server: docker.io/your_registry_user
+
+  # The username used to log into the registry.
+  username: YOUR_USERNAME
+
+  # Optional: The password or token to log into the registry. If omitted,
+  # Kamal will use the credentials from the local Docker config or ENV vars.
+  password:
+    - ENV_VAR_FOR_PASSWORD # Recommended: Get password from an environment variable.
+
+# -------------------------------------------------------------------------
+# 4. SERVER CONFIGURATION (Target Machines)
+# -------------------------------------------------------------------------
+
+# Defines the SSH configuration for connecting to the remote servers.
+ssh:
+  # The user used for SSH connections (e.g., 'root', 'ubuntu', 'ec2-user').
+  user: root
+
+  # Paths to SSH private keys used for authentication.
+  keys:
+    - /path/to/your/ssh/key.pem
+
+# Defines the roles (services) and which servers they run on.
+servers:
+  # 'web' role: The primary web-serving component, exposed via the proxy.
+  # Listing multiple hosts here scales out the 'web' service.
+  web:
+    - 192.168.1.10 # Main web server (Kamal will deploy 1 copy here)
+    - 192.168.1.11 # Secondary web server (Kamal will deploy 1 copy here)
+
+  # 'worker' role: Background processing, usually not exposed directly.
+  workers:
+    - 192.168.1.20 # Worker server (Kamal will deploy 1 copy here)
+  
+  # 'db' role: A custom role for a primary database (e.g., Postgres).
+  db:
+    - 192.168.1.30 # Dedicated DB server
+
+# -------------------------------------------------------------------------
+# 5. ROLES & COMMANDS (Container Definitions)
+# -------------------------------------------------------------------------
+
+# Overrides default container behavior for specific roles/services.
+roles:
+  # Web Role Definition
+  web:
+    # Optional: Specifies a different Dockerfile to use for this role only.
+    # dockerfile: Dockerfile.web
+    
+    # Optional: Overrides the default command in the Dockerfile (CMD).
+    cmd: "puma -C config/puma.rb" 
+
+  # Worker Role Definition (Note: Workers usually don't need a port exposed)
+  workers:
+    # Required: Defines the command to run for the background process.
+    cmd: "bundle exec sidekiq -c 5" 
+
+  # Database Role Definition (Must be deployed manually with 'kamal app start db')
+  db:
+    # Defines the specific container image for this role (overrides top-level image).
+    image: postgres:15-alpine
+    # Specifies volumes for persistent storage.
+    volumes:
+      - data:/var/lib/postgresql/data
+    # Maps a container port to the host machine (DB access)
+    port: 5432:5432
+    # Ensures the container always restarts if it crashes.
+    restart: "always"
+
+# -------------------------------------------------------------------------
+# 6. ENVIRONMENT VARIABLES & SECRETS
+# -------------------------------------------------------------------------
+
+env:
+  # Explicitly defined environment variables (clear text).
+  clear:
+    # Used for different commands based on the role (e.g., workers may need different settings)
+    RAILS_MAX_THREADS: 5
+    RACK_ENV: production
+  
+  # Secrets fetched from the remote host where the container is running.
+  # Kamal SSHes to the host, runs 'cat <path>', and injects the output as ENV vars.
+  secret:
+    - RAILS_MASTER_KEY=/etc/secrets/master.key
+    - AWS_SECRET_ACCESS_KEY=/etc/secrets/aws_key
+
+# -------------------------------------------------------------------------
+# 7. PROXY (Traffic Routing and Health Checks)
+# -------------------------------------------------------------------------
+
+proxy:
+  # Required: The port your application inside the container listens on.
+  # Traefik (the default proxy) will route external traffic to this port.
+  app_port: 3000
+
+  # Optional: Custom port Traefik itself listens on (default: 80).
+  # listen_port: 80
+
+  # Healthcheck settings used by Traefik to determine if a container is ready.
+  healthcheck:
+    # The path Traefik queries (e.g., GET /up)
+    path: /up
+    # How often Traefik checks the health (seconds).
+    interval: 1
+    # How long Traefik waits for a response (seconds).
+    timeout: 2
+    # The minimum number of successful checks before the container is marked healthy.
+    max_attempts: 10
+
+# -------------------------------------------------------------------------
+# 8. HOOKS (Lifecycle Management)
+# -------------------------------------------------------------------------
+
+# Hooks execute commands on the remote server at different points in the deployment lifecycle.
+# Use 'run' to execute on all servers, or specify by role (e.g., 'web:').
+hooks:
+  # Executes before the new image is built.
+  pre-build:
+    - echo "Starting build process..."
+
+  # Executes after the image is built and pushed, but before deployment starts.
+  pre-deploy:
+    - web: bundle exec rails assets:precompile # Example: Precompile assets on web hosts.
+
+  # Executes after the new container is running, but BEFORE the proxy switches traffic.
+  pre-switch:
+    - web: bundle exec rake db:migrate # Example: Run migrations (often on web host).
+
+  # Executes after the proxy has switched to the new container.
+  post-switch:
+    - web: echo "Deployment complete and live."
+
+  # Executes after old containers are gracefully shut down.
+  post-deploy:
+    - echo "Old containers cleaned up."

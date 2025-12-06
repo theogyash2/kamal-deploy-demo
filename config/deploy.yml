@@ -1,0 +1,70 @@
+service: app_a_web
+image: app-a
+deploy_timeout: 120
+builder:
+  arch: amd64
+  context: "/Users/yash/Desktop/kamal-demo/app_a"
+  dockerfile: "app_a/Dockerfile"
+  
+
+servers:
+  web:
+    hosts:
+      - 43.205.127.168
+    env:
+      MAIN: web
+    proxy:
+      PORT: 
+    # cmd: sh -c node web.js
+  worker: 
+    hosts:
+      -  43.205.127.168
+    env:
+      MAIN: worker
+    # cmd: sh -c node worker.js
+
+    
+
+# service: app_a_worker
+# image: app-a
+# builder:
+#   arch: amd64
+#   context: "../app_a"
+#   dockerfile: "app_a/Dockerfile"
+# env:
+#   clear:
+#     MAIN: worker
+
+
+# service: app_b_web
+# image: app-b
+# builder:
+#   arch: amd64
+#   context: "/Users/yash/Desktop/kamal-demo/app_b"
+#   dockerfile: "app_b/Dockerfile"
+# env:
+#   clear:
+#     PORT: 4000
+
+
+ssh:
+  user: root
+  keys:
+    - /Users/yash/Downloads/kamal-test.pem
+
+proxy:
+  app_port: 3000           # tells kamal-proxy which port your app listens on (defaults to 80)
+  healthcheck:             # optional — tune the healthcheck behaviour
+    path: /up              # default is /up (leave if your app exposes /up)
+    interval:  1           # seconds between checks
+    timeout: 3 
+    
+
+
+  
+
+registry:
+  server: 977098999002.dkr.ecr.ap-south-1.amazonaws.com
+  username: AWS
+  password: 
+

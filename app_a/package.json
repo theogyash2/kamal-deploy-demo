@@ -1,0 +1,12 @@
+{
+  "name": "app-a",
+  "version": "1.0.0",
+  "main": "web.js",
+  "scripts": {
+    "start": "MAIN=web node web.js",
+    "worker": "MAIN=worker node worker.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
