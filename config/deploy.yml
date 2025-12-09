@@ -64,7 +64,7 @@ proxy:
   
 
 registry:
-  server: 977098999002.dkr.ecr.ap-south-1.amazonaws.com
+  server: dkr.ecr.ap-south-1.amazonaws.com
   username: AWS
   password: 
 
