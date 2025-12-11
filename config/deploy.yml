@@ -3,14 +3,12 @@ image: app-a
 deploy_timeout: 120
 builder:
   arch: amd64
-  context: "/Users/yash/Desktop/kamal-demo/app_a"
-  dockerfile: "app_a/Dockerfile"
   
 
 servers:
   web:
     hosts:
-      - 43.205.127.168
+      - Instance Public IP
     env:
       MAIN: web
     proxy:
@@ -18,7 +16,7 @@ servers:
     # cmd: sh -c node web.js
   worker: 
     hosts:
-      -  43.205.127.168
+      -  Instance Public IP
     env:
       MAIN: worker
     # cmd: sh -c node worker.js
@@ -28,7 +26,7 @@ servers:
 ssh:
   user: root
   keys:
-    - /Users/yash/Downloads/kamal-test.pem
+    - path to ssh keys
 
 proxy:
   app_port: 3000           # tells kamal-proxy which port your app listens on (defaults to 80)
