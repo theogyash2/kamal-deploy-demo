@@ -23,28 +23,6 @@ servers:
       MAIN: worker
     # cmd: sh -c node worker.js
 
-    
-
-# service: app_a_worker
-# image: app-a
-# builder:
-#   arch: amd64
-#   context: "../app_a"
-#   dockerfile: "app_a/Dockerfile"
-# env:
-#   clear:
-#     MAIN: worker
-
-
-# service: app_b_web
-# image: app-b
-# builder:
-#   arch: amd64
-#   context: "/Users/yash/Desktop/kamal-demo/app_b"
-#   dockerfile: "app_b/Dockerfile"
-# env:
-#   clear:
-#     PORT: 4000
 
 
 ssh:
