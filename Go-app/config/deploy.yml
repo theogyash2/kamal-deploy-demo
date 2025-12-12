@@ -31,7 +31,7 @@ ssh:
     - /Users/yash/Downloads/kamal-test.pem
 
 registry:
-  server: 977098999002.dkr.ecr.ap-south-1.amazonaws.com 
+  server: 123456789.dkr.ecr.ap-south-1.amazonaws.com 
   username: AWS                                             
   password: <%= %x(aws ecr get-login-password --region ap-south-1 --profile adsyntrix) %>
 
