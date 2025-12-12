@@ -1,6 +1,13 @@
-gem install kamal
+Prequisities:
 
-kamal init
+1. ECR REPO NAME
+2. INSTANCE PUBLIC IP
+3. SSH KEYS PATH ON LOCAL
+4. DOCKERFILE
+5. DOMAIN URL
+6. SECRETS/ENV SETUP IN THE AWS SECRET MANAGER
+7. AWS PROFILE SETUP IN LOCAL SHELL
+
 
 1. Create the EC2 instance with following user data:
 
@@ -59,6 +66,9 @@ CMD ["sh", "-c", "node ${MAIN}.js"] #changes according to env variable
 4. Initialize Configuration Files
 ```
 cd project-folder-name
+```
+```
+gem install kamal
 ```
 ```
 kamal init
