@@ -9,6 +9,8 @@ Prequisities:
 7. AWS PROFILE SETUP IN LOCAL SHELL
 
 
+
+
 1. Create the EC2 instance with following user data:
 
 ```
