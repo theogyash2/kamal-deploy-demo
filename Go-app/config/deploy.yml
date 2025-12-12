@@ -1,0 +1,50 @@
+
+
+service: my-go-app  
+image: kamal-go         
+servers:
+  web:
+    hosts:
+      - 13.127.117.248
+
+    env:
+      clear:
+        APP_ROLE: web
+
+  worker:
+    hosts:
+      - 13.127.117.248
+    cmd: /app/my-go-app
+    env:
+      clear:
+        APP_ROLE: worker
+    proxy: false
+
+  # secret:
+  #   - DB_HOST      # If $DB_HOST is unset locally, Kamal fails.
+  #   - SECRET_KEY
+
+ssh:
+  user: root
+  # password: 1234
+  keys:
+    - /Users/yash/Downloads/kamal-test.pem
+
+registry:
+  server: 123456789.dkr.ecr.ap-south-1.amazonaws.com 
+  username: AWS                                             
+  password: <%= %x(aws ecr get-login-password --region ap-south-1 --profile adsyntrix) %>
+
+
+
+proxy:
+  host: 13.127.117.248
+  app_port: 3001       
+  healthcheck:             
+    path: /up              
+    interval:  1           
+    timeout: 3         
+    
+
+builder:
+  arch: amd64
